@@ -90,19 +90,22 @@ class ConfSoilCarbon(Confrontation):
         t0 = (y0-1850  )*365
         tf = (yf-1850+1)*365
         mod_soilc = m.extractTimeSeries("cSoilAbove1m",
-                                        alt_vars     = ["soilc","cSoil"],
+                                        alt_vars     = ["soilc","cSoil","TOTSOMC_1m"],
                                         initial_time = t0,
                                         final_time   = tf).integrateInTime(mean=True).convert("kg m-2")
         mod_npp   = m.extractTimeSeries("npp",
+                                        alt_vars     = ["NPP"],
                                         initial_time = t0,
                                         final_time   = tf,
                                         expression   = "gpp-ra").integrateInTime(mean=True).convert("kg m-2 yr-1")
         mod_tas   = m.extractTimeSeries("tas",
+                                        alt_vars     = ["TSA"],
                                         initial_time = t0,
                                         final_time   = tf).integrateInTime(mean=True).convert("degC")
         mod_pr    = m.extractTimeSeries("pr",
                                         initial_time = t0,
-                                        final_time   = tf).integrateInTime(mean=True).convert("mm yr-1")
+                                        final_time   = tf,
+                                        expression   = "RAIN+SNOW").integrateInTime(mean=True).convert("mm yr-1")
         mod_pet   = Variable(lat=LAT,lon=LON,unit="mm yr-1",data=pet).interpolate(lat=mod_pr.lat,lon=mod_pr.lon)
         
         # Determine what will be masked

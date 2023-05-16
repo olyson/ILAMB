@@ -2,7 +2,7 @@
 # this file if you are running on a institutional machine where you
 # need to submit jobs in order to run. The difference is that this
 # file will attempt to wrap the system MPI.
-name: ilamb
+name: ilamb_lmwg
 channels:
   - conda-forge
   - defaults
@@ -19,5 +19,6 @@ dependencies:
   - cf_units
   - cython
   - psutil
+  - pip
   - pip:
     - mpi4py
