@@ -268,9 +268,21 @@ class ConfPermafrost(Confrontation):
         for ptype, pflag in zip(["d", "c"], [1, 2]):
             both[ptype] = _area_bias(bias, -pflag)
             missed[ptype] = _area_bias(bias, pflag)
-            score_missed[ptype] = both[ptype] / (both[ptype] + missed[ptype])
+            #print("ptype: ",ptype)
+            #print("pflag: ",pflag)
+            #print("missed: ",missed[ptype])
+            #print("both: ",both[ptype])
+            #print("both+missed: ",both[ptype]+missed[ptype])
+            #print("both/both+missed: ",both[ptype] / (both[ptype] + missed[ptype]))
+            with np.errstate(under='ignore'):
+            #np.seterr(under='ignore')
+                score_missed[ptype] = both[ptype] / (both[ptype] + missed[ptype])
+            #print("score_missed: ",score_missed[ptype])
             area_both += both[ptype]
+            #print("area_both: ",area_both)
+            #print("area_mod.data: ",area_mod.data)
         score_excess = both[ptype] / area_mod.data
+        #print("score_excess: ",score_excess)
 
         with Dataset(
             "%s/%s_%s.nc" % (self.output_path, self.name, m.name), mode="w"
