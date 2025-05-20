@@ -187,6 +187,7 @@ class Confrontation(object):
             )
             msg += "%s\n\nbut I cannot find it. " % self.source
             msg += "Did you download the data? Have you set the ILAMB_ROOT envronment variable?\n"
+            logger.debug(f"[{self.longname}] {msg}")
             raise il.MisplacedData(msg)
 
         # Setup a html layout for generating web views of the results
@@ -344,7 +345,8 @@ class Confrontation(object):
             t0=None if len(self.study_limits) != 2 else self.study_limits[0],
             tf=None if len(self.study_limits) != 2 else self.study_limits[1],
         )
-        obs.data *= self.scale_factor
+        with np.errstate(all="ignore"):
+            obs.data *= self.scale_factor
         if obs.time is None:
             raise il.NotTemporalVariable()
         self.pruneRegions(obs)
@@ -599,7 +601,7 @@ class Confrontation(object):
 
             # Determine plot limits and colormap
             if opts["sym"]:
-                vabs = max(abs(limits[pname]["min"]), abs(limits[pname]["min"]))
+                vabs = max(abs(limits[pname]["min"]), abs(limits[pname]["max"]))
                 limits[pname]["min"] = -vabs
                 limits[pname]["max"] = vabs
             if "shift" in pname:
@@ -618,7 +620,7 @@ class Confrontation(object):
             if limits[pname]["cmap"] == "choose":
                 limits[pname]["cmap"] = self.cmap
             if "score" in pname:
-                limits[pname]["cmap"] = plt.cm.get_cmap(limits[pname]["cmap"])
+                limits[pname]["cmap"] = plt.get_cmap(limits[pname]["cmap"])
 
             # Plot a legend for each key
             if opts["haslegend"]:
@@ -703,6 +705,8 @@ class Confrontation(object):
                         weight = self.weight[score]
                     overall_score += weight * scalars.variables[v][...]
                     sum_of_weights += weight
+                if np.abs(overall_score) < 1e-12:
+                    overall_score = np.nan
                 overall_score /= max(sum_of_weights, 1e-12)
                 scores["Overall Score %s" % region] = overall_score
             return scores
